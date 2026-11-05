@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../app/routes.dart';
@@ -15,6 +16,8 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
 
   bool _obscurePassword = true;
+  bool _error = false;
+  String _errorMessage = "";
 
   @override
   void dispose() {
@@ -23,17 +26,50 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  void _submit() {
+  void _submit() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
-    // TODO: comprobar las credenciales con la base de datos.
-    Navigator.pushReplacementNamed(context, AppRoutes.home);
+    final theme = Theme.of(context);
+
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
+
+      setState(() {
+        _error = false;
+        _errorMessage = "";
+      });
+
+      Navigator.pushReplacementNamed(context, AppRoutes.home);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'invalid-credential') {
+        setState(() {
+          _error = true;
+          _errorMessage = "No se ha podido iniciar sesión, el usuario o la contraseña son incorrectos.";
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Ha ocurrido un error inesperado, vuelve a intentarlo más tarde.',
+              style: TextStyle(fontSize: 16),
+            ),
+            backgroundColor: theme.colorScheme.error,
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       body: SafeArea(
         child: LayoutBuilder(
@@ -158,6 +194,45 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),
                           ),
+
+                          const SizedBox(height: 16),
+
+                          if (_error)
+                            Container(
+                              height: 52,
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.errorContainer,
+                                border: Border.all(
+                                  color: theme.colorScheme.error,
+                                  width: 2,
+                                ),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: Row(
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsetsGeometry.symmetric(
+                                      vertical: 10,
+                                      horizontal: 5,
+                                    ),
+                                    child: Icon(
+                                      Icons.info_outline,
+                                      color: theme.colorScheme.error,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: RichText(
+                                      text: TextSpan(
+                                        text: _errorMessage,
+                                        style: TextStyle(
+                                          color: theme.colorScheme.error,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
 
                           const SizedBox(height: 16),
 

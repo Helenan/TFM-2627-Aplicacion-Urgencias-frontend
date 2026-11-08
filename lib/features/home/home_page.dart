@@ -42,6 +42,17 @@ class _HomePageState extends State<HomePage> {
         title: const Text('Urgencias'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.supervised_user_circle),
+            tooltip: 'Crear usuario',
+            onPressed: () {
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                AppRoutes.user,
+                (route) => false,
+              );
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Cerrar sesión',
             onPressed: _logout,

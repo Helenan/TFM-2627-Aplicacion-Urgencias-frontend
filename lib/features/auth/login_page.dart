@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:tfm_2627_aplicacion_urgencias_frontend/utils/error_container.dart';
 
 import '../../app/routes.dart';
 
@@ -68,8 +69,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Scaffold(
       body: SafeArea(
         child: LayoutBuilder(
@@ -195,44 +194,10 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
 
-                          const SizedBox(height: 16),
-
-                          if (_error)
-                            Container(
-                              height: 52,
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.errorContainer,
-                                border: Border.all(
-                                  color: theme.colorScheme.error,
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: Row(
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsetsGeometry.symmetric(
-                                      vertical: 10,
-                                      horizontal: 5,
-                                    ),
-                                    child: Icon(
-                                      Icons.info_outline,
-                                      color: theme.colorScheme.error,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: RichText(
-                                      text: TextSpan(
-                                        text: _errorMessage,
-                                        style: TextStyle(
-                                          color: theme.colorScheme.error,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                          if (_error) ...[
+                            const SizedBox(height: 22),
+                            ErrorContainer(errorMessage: _errorMessage),
+                          ],
 
                           const SizedBox(height: 16),
 

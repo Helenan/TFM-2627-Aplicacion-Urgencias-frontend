@@ -8,5 +8,5 @@ class AppColors {
   static const borderColor = Color(0xFFE1E5EE);
 
   static const error = Color(0xFFA03030);
-  static const errorBackground = Color(0xFFCA9090);
+  static const errorBackground = Color(0xFFFAA0A0);
 }

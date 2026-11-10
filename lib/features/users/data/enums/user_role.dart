@@ -15,3 +15,7 @@ extension UserRoleDisplayExtension on UserRole {
     }
   }
 }
+
+UserRole? getUserRole(String? value) {
+  return UserRole.values.where((e) => e.name == value).firstOrNull;
+}

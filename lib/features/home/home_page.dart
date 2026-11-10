@@ -42,38 +42,55 @@ class _HomePageState extends State<HomePage> {
         title: const Text('Urgencias'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.supervised_user_circle),
-            tooltip: 'Crear usuario',
-            onPressed: () {
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                AppRoutes.user,
-                (route) => false,
-              );
-            },
-          ),
-          IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Cerrar sesión',
             onPressed: _logout,
           ),
         ],
       ),
-      body: const Center(
+      body: Center(
         child: Padding(
-          padding: EdgeInsets.all(24),
+          padding: const EdgeInsets.all(24),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                Icons.check_circle_outline,
-                size: 72,
-                color: Color(0xFF365CF5),
-              ),
-              SizedBox(height: 20),
-              Text(
-                '¡Bienvenido!',
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              Card(
+                clipBehavior: Clip.hardEdge,
+                color: Colors.white70,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, AppRoutes.user);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.person_add_alt_1,
+                              size: 24,
+                              color: Colors.blue,
+                            ),
+                            const SizedBox(width: 12),
+                            const Text(
+                              'Crear usuario',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        const Text(
+                          'Registrar un nuevo usuario.',
+                          style: TextStyle(color: Colors.black87, fontSize: 14),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ],
           ),

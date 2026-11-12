@@ -1,1 +1,45 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"tfm-2627-aplicacion-urgencias","appId":"1:112181682429:android:a35cccc8581f9bdfe95e94","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"tfm-2627-aplicacion-urgencias","configurations":{"android":"1:112181682429:android:a35cccc8581f9bdfe95e94"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "tfm-2627-aplicacion-urgencias",
+          "appId": "1:112181682429:android:a35cccc8581f9bdfe95e94",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "tfm-2627-aplicacion-urgencias",
+          "configurations": {
+            "android": "1:112181682429:android:a35cccc8581f9bdfe95e94"
+          }
+        }
+      }
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "disallowLegacyRuntimeConfig": true,
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ]
+    }
+  ],
+  "emulators": {
+    "functions": {
+      "port": 5001,
+      "host": "0.0.0.0"
+    },
+    "ui": {
+      "enabled": true
+    },
+    "singleProjectMode": true
+  }
+}

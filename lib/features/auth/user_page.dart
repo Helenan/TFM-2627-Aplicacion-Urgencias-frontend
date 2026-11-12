@@ -1,11 +1,13 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart' hide User;
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:tfm_2627_aplicacion_urgencias_frontend/utils/email_field.dart';
 import 'package:tfm_2627_aplicacion_urgencias_frontend/utils/password_field.dart';
 import 'package:tfm_2627_aplicacion_urgencias_frontend/utils/role_select.dart';
 
+import '../../services/user_service.dart';
+import '../../utils/error_banner.dart';
 import '../../utils/error_container.dart';
+import '../../utils/sucess_banner.dart';
 import '../users/data/enums/user_role.dart';
 import '../users/data/user.dart';
 
@@ -51,25 +53,30 @@ class _UserPageState extends State<UserPage> {
       speciality: _specialtyController.text.trim(),
     );
 
-    final credential = await FirebaseAuth.instance
-        .createUserWithEmailAndPassword(email: email, password: password);
+    try {
+      await UserService().createUser(email, password, newUser);
 
-    final firebaseUser = credential.user;
+      if (!mounted) {
+        return;
+      }
+      Navigator.pop(context);
+      showSuccessBanner(context, 'Usuario creado correctamente.');
+    } on FirebaseFunctionsException catch (e) {
+      if (!mounted) return;
 
-    if (firebaseUser == null) {
-      _error = true;
-      _errorMessage = 'No se ha podido crear el usuario.';
-      return;
-    }
-
-    await FirebaseFirestore.instance
-        .collection('usuarios')
-        .doc(firebaseUser.uid)
-        .set({
-          ...newUser.toJson(),
-          'uid': firebaseUser.uid,
-          'createdAt': DateTime.now(),
+      if (e.code == "already-exists") {
+        setState(() {
+          _error = true;
+          _errorMessage = 'Ya existe un usuario registrado con ese correo.\n Pruebe otro correo.';
         });
+        return;
+      }
+
+      showErrorBanner(
+        context,
+        'Ha ocurrido un error al registrar al usuario. Pruebe otra vez en unos minutos y si el problema persiste contacte con el administrador.',
+      );
+    }
   }
 
   @override

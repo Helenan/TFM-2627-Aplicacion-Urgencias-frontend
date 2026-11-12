@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:tfm_2627_aplicacion_urgencias_frontend/utils/error_banner.dart';
 import 'package:tfm_2627_aplicacion_urgencias_frontend/utils/error_container.dart';
 
 import '../../app/routes.dart';
@@ -53,15 +54,9 @@ class _LoginPageState extends State<LoginPage> {
           _errorMessage = "No se ha podido iniciar sesión, el usuario o la contraseña son incorrectos.";
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Ha ocurrido un error inesperado, vuelve a intentarlo más tarde.',
-              style: TextStyle(fontSize: 16),
-            ),
-            backgroundColor: theme.colorScheme.error,
-            duration: Duration(seconds: 3),
-          ),
+        showErrorBanner(
+          context,
+          'Ha ocurrido un error inesperado, vuelve a intentarlo más tarde o contacta con el administrador.',
         );
       }
     }

@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tfm_2627_aplicacion_urgencias_frontend/services/auth_service.dart';
+import 'package:tfm_2627_aplicacion_urgencias_frontend/utils/error_banner.dart';
 
 import '../../app/routes.dart';
 
@@ -45,13 +46,7 @@ class _HomePageState extends State<HomePage> {
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('No se ha podido cerrar la sesión.'),
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 3),
-        ),
-      );
+      showErrorBanner(context, 'No se ha podido cerrar la sesión.');
     }
   }
 

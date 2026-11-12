@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:tfm_2627_aplicacion_urgencias_frontend/utils/error_banner.dart';
+import 'package:tfm_2627_aplicacion_urgencias_frontend/utils/error_container.dart';
 
 import '../../app/routes.dart';
 
@@ -52,15 +54,9 @@ class _LoginPageState extends State<LoginPage> {
           _errorMessage = "No se ha podido iniciar sesión, el usuario o la contraseña son incorrectos.";
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Ha ocurrido un error inesperado, vuelve a intentarlo más tarde.',
-              style: TextStyle(fontSize: 16),
-            ),
-            backgroundColor: theme.colorScheme.error,
-            duration: Duration(seconds: 3),
-          ),
+        showErrorBanner(
+          context,
+          'Ha ocurrido un error inesperado, vuelve a intentarlo más tarde o contacta con el administrador.',
         );
       }
     }
@@ -68,8 +64,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Scaffold(
       body: SafeArea(
         child: LayoutBuilder(
@@ -195,44 +189,10 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
 
-                          const SizedBox(height: 16),
-
-                          if (_error)
-                            Container(
-                              height: 52,
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.errorContainer,
-                                border: Border.all(
-                                  color: theme.colorScheme.error,
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: Row(
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsetsGeometry.symmetric(
-                                      vertical: 10,
-                                      horizontal: 5,
-                                    ),
-                                    child: Icon(
-                                      Icons.info_outline,
-                                      color: theme.colorScheme.error,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: RichText(
-                                      text: TextSpan(
-                                        text: _errorMessage,
-                                        style: TextStyle(
-                                          color: theme.colorScheme.error,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                          if (_error) ...[
+                            const SizedBox(height: 22),
+                            ErrorContainer(errorMessage: _errorMessage),
+                          ],
 
                           const SizedBox(height: 16),
 

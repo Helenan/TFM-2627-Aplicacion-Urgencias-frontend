@@ -37,7 +37,7 @@ async function createPatient(patient) {
     });
 
       return {
-        uid: patientFirestoreRef.uid
+        uid: patientFirestoreRef.id
       };
   } catch (error) {
     console.error("Patient creation failed:", error);
@@ -46,8 +46,32 @@ async function createPatient(patient) {
   }
 }
 
+async function updatePatient(uid, patient) {
+  try {
+    // Remove uid from patient, it is the document id
+    const {uid: _uid, ...patientData} = patient;
+
+    await getFirestore()
+        .collection(patientCollection)
+        .doc(uid)
+        .update({
+          ...patientData,
+          updatedAt: Date.now()
+        });
+
+    return {
+      uid: uid
+    };
+  } catch (error) {
+    console.error("Patient update failed:", error);
+
+    throw new HttpsError("internal", "Unable to update patient, something went wrong.");
+  }
+}
+
 module.exports = {
   getPatient,
   getPatientsStartingWith,
-  createPatient
+  createPatient,
+  updatePatient
 };

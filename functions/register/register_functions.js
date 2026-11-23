@@ -32,9 +32,14 @@ exports.registerPatient = onCall(async (request) => {
     if (patient?.uid == null) { // unknown patient
         const existingPatients = await patientRepository.getPatient(patient.identityDocument);
 
-        const patientDocUid = existingPatients.empty
-            ? (await patientRepository.createPatient(patient)).uid
-            : existingPatients.docs[0].id;
+        let patientDocUid;
+
+        if (existingPatients.empty) {
+            patientDocUid = (await patientRepository.createPatient(patient)).uid;
+        } else {
+            patientDocUid = existingPatients.docs[0].id;
+            await patientRepository.updatePatient(patientDocUid, patient);
+        }
 
         register.patient.uid = patientDocUid;
     }

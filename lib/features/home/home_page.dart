@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tfm_2627_aplicacion_urgencias_frontend/services/auth_service.dart';
+import 'package:tfm_2627_aplicacion_urgencias_frontend/utils/bottom_navbar.dart';
 import 'package:tfm_2627_aplicacion_urgencias_frontend/utils/error_banner.dart';
+import 'package:tfm_2627_aplicacion_urgencias_frontend/utils/nav_entry.dart';
 
 import '../../app/routes.dart';
 
@@ -89,6 +91,22 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
+      bottomNavigationBar: _isDoctor
+          ? BottomNavbar(
+              entries: [
+                NavEntry(
+                  icon: const Icon(
+                    Icons.local_hospital,
+                    color: Colors.blue,
+                    size: 36,
+                  ),
+                  label: 'Registrar paciente',
+                  onTap: (context) =>
+                      Navigator.pushNamed(context, AppRoutes.register),
+                ),
+              ],
+            )
+          : null,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24),

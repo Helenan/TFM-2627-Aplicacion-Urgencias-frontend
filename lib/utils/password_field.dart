@@ -69,7 +69,7 @@ class _PasswordFieldState extends State<PasswordField> {
             }
 
             if (value.length < 6) {
-              return 'Debe tener al menos 6 caracteres';
+              return '${widget.errorText}. Debe tener al menos 6 caracteres';
             }
 
             return null;

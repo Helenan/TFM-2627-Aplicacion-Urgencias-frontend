@@ -15,20 +15,23 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final authorization = AuthorizationService();
   bool _isAdmin = false;
+  bool _isDoctor = false;
 
   @override
   void initState() {
     super.initState();
-    _checkAdmin();
+    _checkUser();
   }
 
-  Future<void> _checkAdmin() async {
-    final result = await authorization.isAdmin();
+  Future<void> _checkUser() async {
+    final admin = await authorization.isAdmin();
+    final doctor = await authorization.isDoctor();
 
     if (!mounted) return;
 
     setState(() {
-      _isAdmin = result;
+      _isAdmin = admin;
+      _isDoctor = doctor;
     });
   }
 
@@ -62,6 +65,29 @@ class _HomePageState extends State<HomePage> {
             onPressed: _logout,
           ),
         ],
+      ),
+      drawer: Drawer(
+        child: SafeArea(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              const Padding(
+                padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+                child: Text('Menú', style: TextStyle(fontSize: 24)),
+              ),
+              const Divider(height: 1),
+              if (_isDoctor)
+                ListTile(
+                  leading: const Icon(Icons.local_hospital, color: Colors.blue),
+                  title: const Text('Registrar paciente'),
+                  onTap: () {
+                    Navigator.pop(context); // close the drawer
+                    Navigator.pushNamed(context, AppRoutes.register);
+                  },
+                ),
+            ],
+          ),
+        ),
       ),
       body: Center(
         child: Padding(

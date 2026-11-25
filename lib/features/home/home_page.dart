@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tfm_2627_aplicacion_urgencias_frontend/services/auth_service.dart';
+import 'package:tfm_2627_aplicacion_urgencias_frontend/utils/bottom_navbar.dart';
 import 'package:tfm_2627_aplicacion_urgencias_frontend/utils/error_banner.dart';
+import 'package:tfm_2627_aplicacion_urgencias_frontend/utils/nav_entry.dart';
 
 import '../../app/routes.dart';
 
@@ -15,20 +17,23 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final authorization = AuthorizationService();
   bool _isAdmin = false;
+  bool _isDoctor = false;
 
   @override
   void initState() {
     super.initState();
-    _checkAdmin();
+    _checkUser();
   }
 
-  Future<void> _checkAdmin() async {
-    final result = await authorization.isAdmin();
+  Future<void> _checkUser() async {
+    final admin = await authorization.isAdmin();
+    final doctor = await authorization.isDoctor();
 
     if (!mounted) return;
 
     setState(() {
-      _isAdmin = result;
+      _isAdmin = admin;
+      _isDoctor = doctor;
     });
   }
 
@@ -63,6 +68,49 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
+      drawer: Drawer(
+        child: SafeArea(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              const Padding(
+                padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+                child: Text('Menú', style: TextStyle(fontSize: 24)),
+              ),
+              const Divider(height: 1),
+              if (_isDoctor)
+                ListTile(
+                  minTileHeight: 64,
+                  leading: Icon(
+                    Icons.local_hospital,
+                    size: 27,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  title: const Text(
+                    'Registrar paciente',
+                    style: TextStyle(fontSize: 17),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context); // close the drawer
+                    Navigator.pushNamed(context, AppRoutes.register);
+                  },
+                ),
+            ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: _isDoctor
+          ? BottomNavbar(
+              entries: [
+                NavEntry(
+                  icon: const Icon(Icons.local_hospital),
+                  label: 'Registrar paciente',
+                  onTap: (context) =>
+                      Navigator.pushNamed(context, AppRoutes.register),
+                ),
+              ],
+            )
+          : null,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24),

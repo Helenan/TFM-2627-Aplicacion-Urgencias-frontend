@@ -14,7 +14,7 @@ class UserService {
         'password': password,
         'user': user.toJson(),
       });
-    } on FirebaseFunctionsException catch (e) {
+    } on FirebaseFunctionsException {
       rethrow;
     }
   }

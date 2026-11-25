@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:tfm_2627_aplicacion_urgencias_frontend/features/users/data/enums/user_role.dart';
 
+import 'app_dropdown.dart';
+
 class RoleSelect extends StatefulWidget {
   final UserRole selectedRole;
   final ValueChanged<UserRole?> onChanged;
@@ -34,7 +36,8 @@ class _RoleSelectState extends State<RoleSelect> {
         ),
         const SizedBox(height: 10),
 
-        DropdownButtonFormField<UserRole>(
+        AppDropdown<UserRole>(
+          value: widget.selectedRole,
           items: UserRole.values.map((role) {
             return DropdownMenuItem(value: role, child: Text(role.displayName));
           }).toList(),

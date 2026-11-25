@@ -52,5 +52,33 @@ class AppTheme {
         ),
       ),
     ),
+    navigationBarTheme: NavigationBarThemeData(
+      backgroundColor: AppColors.navBarBackground,
+      // Read by NavEntry to style the label under each icon
+      labelTextStyle: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.disabled)) {
+          return const TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w500,
+            color: AppColors.textColorDisabled,
+          );
+        }
+
+        if (states.contains(WidgetState.selected)) {
+          return const TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.3,
+            color: AppColors.textColorSelected,
+          );
+        }
+
+        return const TextStyle(
+          fontSize: 17,
+          fontWeight: FontWeight.w600,
+          color: AppColors.textColor,
+        );
+      }),
+    ),
   );
 }

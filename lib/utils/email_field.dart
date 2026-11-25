@@ -12,7 +12,7 @@ class EmailField extends StatefulWidget {
     required this.emailController,
     required this.submit,
     this.label = 'Correo electrónico',
-    this.errorText = 'Introduce tu correo electrónico',
+    this.errorText = 'Introduce un correo electrónico válido',
     this.hintText = 'tucorreo@direccion.com',
   });
 
@@ -51,7 +51,7 @@ class _EmailFieldState extends State<EmailField> {
             final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
 
             if (!emailRegex.hasMatch(email)) {
-              return 'Introduce un correo válido';
+              return widget.errorText;
             }
 
             return null;

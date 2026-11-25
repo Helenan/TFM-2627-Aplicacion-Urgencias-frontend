@@ -44,5 +44,5 @@ exports.registerPatient = onCall(async (request) => {
         register.patient.uid = patientDocUid;
     }
 
-    return await registerRepository.registerPatient(register);
+    return await registerRepository.registerPatient(register, request.auth.uid);
 });

@@ -15,6 +15,8 @@ abstract class PatientRegister with _$PatientRegister {
     // Medication/treatment prescribed for their care in the emergency room
     String? treatment,
     @Default(true) bool isOpen,
+    String? doctor,
+    String? nurse,
   }) = _PatientRegister;
 
   factory PatientRegister.fromJson(Map<String, dynamic> json) =>

@@ -14,6 +14,13 @@ async function getUser(uid) {
   return userDoc;
 }
 
+async function getUsersByRole(role) {
+  return await getFirestore()
+      .collection(userCollection)
+      .where('role', '==', role)
+      .get();
+}
+
 async function createUser(email, password, user) {
   try {
     const userAuthRecord = await getAuth().createUser({
@@ -64,6 +71,7 @@ async function deleteUser(uid) {
 
 module.exports = {
   getUser,
+  getUsersByRole,
   createUser,
   deleteUser
 };

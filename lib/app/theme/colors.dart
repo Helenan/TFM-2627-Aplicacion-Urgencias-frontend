@@ -7,7 +7,8 @@ class AppColors {
   static const componentBackground = Color(0xFFFFFFFF);
   static const borderColor = Color(0xFFE1E5EE);
 
-  static const navBarBackground = Color(0xFFDDE4FD);
+  static const navBarBackground = Color(0xFFDAE1F3);
+  static const navBarBorder = Color(0xFFB4BCCD);
 
   static const textColor = Color(0xFF1B1F2A);
   static const textColorSelected = Color(0xFF000000);

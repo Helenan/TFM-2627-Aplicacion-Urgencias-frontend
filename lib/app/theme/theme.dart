@@ -58,7 +58,7 @@ class AppTheme {
       labelTextStyle: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.disabled)) {
           return const TextStyle(
-            fontSize: 16,
+            fontSize: 17,
             fontWeight: FontWeight.w500,
             color: AppColors.textColorDisabled,
           );
@@ -66,7 +66,7 @@ class AppTheme {
 
         if (states.contains(WidgetState.selected)) {
           return const TextStyle(
-            fontSize: 16,
+            fontSize: 17,
             fontWeight: FontWeight.w700,
             letterSpacing: 0.3,
             color: AppColors.textColorSelected,
@@ -74,9 +74,8 @@ class AppTheme {
         }
 
         return const TextStyle(
-          fontSize: 16,
+          fontSize: 17,
           fontWeight: FontWeight.w600,
-          letterSpacing: 0.2,
           color: AppColors.textColor,
         );
       }),

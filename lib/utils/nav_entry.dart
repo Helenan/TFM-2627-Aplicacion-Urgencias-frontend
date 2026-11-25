@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../app/theme/colors.dart';
+
 class NavEntry extends StatelessWidget {
   final Icon icon;
   final String? label;
@@ -9,26 +11,44 @@ class NavEntry extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final navTheme = Theme.of(context).navigationBarTheme;
+    final theme = Theme.of(context);
+    final navTheme = theme.navigationBarTheme;
     final labelStyle =
         navTheme.labelTextStyle?.resolve({}) ?? const TextStyle();
 
     return InkWell(
+      borderRadius: BorderRadius.circular(24),
       onTap: () async {
         if (onTap != null) {
           await onTap!(context);
         }
       },
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (label != null) Text(label!, style: labelStyle),
-            const SizedBox(height: 4),
-
-            icon,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 64,
+            height: 36,
+            alignment: Alignment.center,
+            decoration: ShapeDecoration(
+              color: AppColors.componentBackground,
+              shape: const StadiumBorder(),
+            ),
+            child: IconTheme.merge(
+              data: IconThemeData(size: 26, color: theme.colorScheme.primary),
+              child: icon,
+            ),
+          ),
+          if (label != null) ...[
+            const SizedBox(height: 6),
+            Text(
+              label!,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: labelStyle,
+            ),
           ],
-        ),
+        ],
       ),
     );
   }

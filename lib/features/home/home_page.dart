@@ -80,8 +80,16 @@ class _HomePageState extends State<HomePage> {
               const Divider(height: 1),
               if (_isDoctor)
                 ListTile(
-                  leading: const Icon(Icons.local_hospital, color: Colors.blue),
-                  title: const Text('Registrar paciente'),
+                  minTileHeight: 64,
+                  leading: Icon(
+                    Icons.local_hospital,
+                    size: 27,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  title: const Text(
+                    'Registrar paciente',
+                    style: TextStyle(fontSize: 17),
+                  ),
                   onTap: () {
                     Navigator.pop(context); // close the drawer
                     Navigator.pushNamed(context, AppRoutes.register);
@@ -95,11 +103,7 @@ class _HomePageState extends State<HomePage> {
           ? BottomNavbar(
               entries: [
                 NavEntry(
-                  icon: const Icon(
-                    Icons.local_hospital,
-                    color: Colors.blue,
-                    size: 36,
-                  ),
+                  icon: const Icon(Icons.local_hospital),
                   label: 'Registrar paciente',
                   onTap: (context) =>
                       Navigator.pushNamed(context, AppRoutes.register),

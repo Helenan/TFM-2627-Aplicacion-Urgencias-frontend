@@ -1,6 +1,7 @@
 const userRepository = require('../users/user_repository');
 const patientRepository = require('../patients/patient_repository');
 const registerRepository = require('../register/register_repository');
+const specialtyRepository = require('../specialty/specialty_repository');
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
 
 exports.registerPatient = onCall(async (request) => {
@@ -28,6 +29,10 @@ exports.registerPatient = onCall(async (request) => {
     if (patient?.identityDocument == null) {
         throw new HttpsError("failed-precondition", "Missing unique attribute 'identityDocument'");
     }
+
+    register.specialtyId =
+        await specialtyRepository.getSpecialtyIdByName(register.specialty?.name);
+    delete register.specialty;
 
     if (patient?.uid == null) { // unknown patient
         const existingPatients = await patientRepository.getPatient(patient.identityDocument);

@@ -1,4 +1,5 @@
 const { getFirestore } = require("firebase-admin/firestore");
+const { HttpsError } = require("firebase-functions/v2/https");
 
 specialtyCollection = "especialidades";
 
@@ -9,6 +10,26 @@ async function getSpecialty(uid) {
       .get();
 
   return specialtyDoc;
+}
+
+async function getSpecialtyIdByName(name) {
+  if (typeof name !== "string" || name.trim() === "") {
+    throw new HttpsError("invalid-argument", "La especialidad no es válida.");
+  }
+
+  const specialties = await getFirestore()
+      .collection(specialtyCollection)
+      .where('name', '==', name)
+      .get();
+
+  if (specialties.size !== 1) {
+    console.error(`Found ${specialties.size} specialties named '${name}'`);
+
+    throw new HttpsError(
+        "failed-precondition", "No se ha podido identificar la especialidad.");
+  }
+
+  return specialties.docs[0].id;
 }
 
 // Normalizes text to lowercase with no diacritics
@@ -63,5 +84,6 @@ async function getSpecialtiesStartingWith(name) {
 
 module.exports = {
   getSpecialty,
+  getSpecialtyIdByName,
   getSpecialtiesStartingWith
 };

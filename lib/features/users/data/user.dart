@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../../register/data/specialty.dart';
 import 'enums/user_role.dart';
 
 part 'user.freezed.dart';
@@ -21,7 +22,8 @@ abstract class User with _$User {
     required String firstName,
     required String lastName,
     @Default(UserRole.doctor) UserRole role,
-    required String speciality,
+    @JsonKey(toJson: _doctorSpecialtyToJson, fromJson: Specialty.fromJson)
+    required Specialty speciality,
   }) = Doctor;
 
   const factory User.nurse({
@@ -36,7 +38,7 @@ abstract class User with _$User {
     required String mail,
     required String firstName,
     required String lastName,
-    String? speciality,
+    Specialty? speciality,
     List<String>? permissions,
   }) {
     switch (role) {
@@ -58,3 +60,6 @@ abstract class User with _$User {
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 }
+
+Map<String, dynamic> _doctorSpecialtyToJson(Specialty specialty) =>
+    specialty.toJson();

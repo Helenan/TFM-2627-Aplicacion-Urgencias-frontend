@@ -1,13 +1,18 @@
+import 'dart:ui';
+
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:tfm_2627_aplicacion_urgencias_frontend/utils/email_field.dart';
 import 'package:tfm_2627_aplicacion_urgencias_frontend/utils/password_field.dart';
+import 'package:tfm_2627_aplicacion_urgencias_frontend/utils/querying_text_field.dart';
 import 'package:tfm_2627_aplicacion_urgencias_frontend/utils/role_select.dart';
 
+import '../../services/specialty_service.dart';
 import '../../services/user_service.dart';
 import '../../utils/error_banner.dart';
 import '../../utils/error_container.dart';
 import '../../utils/sucess_banner.dart';
+import '../register/data/specialty.dart';
 import '../users/data/enums/user_role.dart';
 import '../users/data/user.dart';
 
@@ -30,19 +35,30 @@ class _UserPageState extends State<UserPage> {
   bool _error = false;
   String _errorMessage = '';
   UserRole _selectedUserRole = UserRole.doctor;
+  Specialty? _selectedSpecialty;
+
+  bool _isSubmitting = false;
 
   void _submit() async {
-    if (!_formKey.currentState!.validate()) {
+    if (_isSubmitting || !_formKey.currentState!.validate()) {
       return;
     }
 
     final password = _passwordController.text.trim();
 
     if (password != _passwordConfirmationController.text.trim()) {
-      _error = true;
-      _errorMessage = 'Las contraseñas no son iguales';
+      setState(() {
+        _error = true;
+        _errorMessage = 'Las contraseñas no son iguales';
+      });
       return;
     }
+
+    setState(() {
+      _isSubmitting = true;
+      _error = false;
+    });
+
     final email = _emailController.text.trim();
 
     final newUser = User.create(
@@ -50,7 +66,7 @@ class _UserPageState extends State<UserPage> {
       mail: email,
       firstName: _nameController.text.trim(),
       lastName: _surnameController.text.trim(),
-      speciality: _specialtyController.text.trim(),
+      speciality: _selectedSpecialty,
     );
 
     try {
@@ -61,10 +77,12 @@ class _UserPageState extends State<UserPage> {
       }
       Navigator.pop(context);
       showSuccessBanner(context, 'Usuario creado correctamente.');
-    } on FirebaseFunctionsException catch (e) {
+    } catch (e) {
       if (!mounted) return;
 
-      if (e.code == "already-exists") {
+      setState(() => _isSubmitting = false);
+
+      if (e is FirebaseFunctionsException && e.code == "already-exists") {
         setState(() {
           _error = true;
           _errorMessage = 'Ya existe un usuario registrado con ese correo.\n Pruebe otro correo.';
@@ -81,158 +99,191 @@ class _UserPageState extends State<UserPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: 420,
-                    minHeight: constraints.maxHeight - 48,
-                  ),
-                  child: IntrinsicHeight(
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Text(
-                            'Añadir un usuario',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 20),
-                          ),
+    return PopScope(
+      canPop: !_isSubmitting,
+      child: Scaffold(
+        body: Stack(
+          children: [
+            SafeArea(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.all(24),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: 420,
+                          minHeight: constraints.maxHeight - 48,
+                        ),
+                        child: IntrinsicHeight(
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Text(
+                                  'Añadir un usuario',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: 20),
+                                ),
 
-                          const SizedBox(height: 36),
+                                const SizedBox(height: 36),
 
-                          Text(
-                            'Nombre',
-                            textAlign: TextAlign.left,
-                            style: TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                          const SizedBox(height: 10),
+                                Text(
+                                  'Nombre',
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(fontWeight: FontWeight.w600),
+                                ),
+                                const SizedBox(height: 10),
 
-                          TextFormField(
-                            controller: _nameController,
-                            textInputAction: TextInputAction.done,
-                            onFieldSubmitted: (_) => () {},
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Nombre del usuario';
-                              }
+                                TextFormField(
+                                  controller: _nameController,
+                                  textInputAction: TextInputAction.done,
+                                  onFieldSubmitted: (_) => () {},
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Nombre del usuario';
+                                    }
 
-                              return null;
-                            },
-                          ),
+                                    return null;
+                                  },
+                                ),
 
-                          const SizedBox(height: 22),
+                                const SizedBox(height: 22),
 
-                          Text(
-                            'Apellidos',
-                            textAlign: TextAlign.left,
-                            style: TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                          const SizedBox(height: 10),
+                                Text(
+                                  'Apellidos',
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(fontWeight: FontWeight.w600),
+                                ),
+                                const SizedBox(height: 10),
 
-                          TextFormField(
-                            controller: _surnameController,
-                            textInputAction: TextInputAction.done,
-                            onFieldSubmitted: (_) => () {},
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Apellidos del usuario';
-                              }
+                                TextFormField(
+                                  controller: _surnameController,
+                                  textInputAction: TextInputAction.done,
+                                  onFieldSubmitted: (_) => () {},
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Apellidos del usuario';
+                                    }
 
-                              return null;
-                            },
-                          ),
+                                    return null;
+                                  },
+                                ),
 
-                          const SizedBox(height: 22),
+                                const SizedBox(height: 22),
 
-                          RoleSelect(
-                            selectedRole: _selectedUserRole,
-                            onChanged: (role) {
-                              if (role == null) {
-                                throw ArgumentError.notNull('role');
-                              }
-                              setState(() {
-                                _selectedUserRole = role;
-                              });
-                            },
-                          ),
+                                RoleSelect(
+                                  selectedRole: _selectedUserRole,
+                                  onChanged: (role) {
+                                    if (role == null) {
+                                      throw ArgumentError.notNull('role');
+                                    }
+                                    setState(() {
+                                      _selectedUserRole = role;
+                                    });
+                                  },
+                                ),
 
-                          if (_selectedUserRole == UserRole.doctor) ...[
-                            const SizedBox(height: 22),
+                                if (_selectedUserRole == UserRole.doctor) ...[
+                                  const SizedBox(height: 22),
 
-                            Text(
-                              'Especialidad',
-                              textAlign: TextAlign.left,
-                              style: TextStyle(fontWeight: FontWeight.w600),
+                                  Text(
+                                    'Especialidad',
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+
+                                  QueryingTextField(
+                                    controller: _specialtyController,
+                                    queryMethod:
+                                        SpecialtyService().querySpecialty,
+                                    displayItem: (specialty) => specialty.name,
+                                    childrenOf: (specialty) =>
+                                        specialty.subspecialties,
+                                    optionsMaxHeight: 300,
+                                    hintText: 'Busca una especialidad',
+                                    onSelected: (specialty) {
+                                      _selectedSpecialty = specialty;
+                                    },
+                                    onChanged: (value) {
+                                      _selectedSpecialty = null;
+                                    },
+                                    validator: (value) {
+                                      if (_selectedSpecialty == null) {
+                                        return 'Seleccione una especialidad de la lista';
+                                      }
+
+                                      return null;
+                                    },
+                                  ),
+                                ],
+
+                                const SizedBox(height: 22),
+
+                                EmailField(
+                                  emailController: _emailController,
+                                  submit: () {},
+                                ),
+
+                                const SizedBox(height: 22),
+
+                                PasswordField(
+                                  passwordController: _passwordController,
+                                  submit: () {},
+                                ),
+
+                                const SizedBox(height: 22),
+
+                                PasswordField(
+                                  passwordController:
+                                      _passwordConfirmationController,
+                                  submit: () {},
+                                  label: 'Confirma la contraseña',
+                                ),
+
+                                if (_error) ...[
+                                  const SizedBox(height: 22),
+                                  ErrorContainer(errorMessage: _errorMessage),
+                                ],
+
+                                const SizedBox(height: 16),
+
+                                SizedBox(
+                                  height: 52,
+                                  child: ElevatedButton(
+                                    onPressed: _isSubmitting ? null : _submit,
+                                    child: const Text('Crear usuario'),
+                                  ),
+                                ),
+
+                                const SizedBox(height: 16),
+                              ],
                             ),
-                            const SizedBox(height: 10),
-
-                            TextFormField(
-                              controller: _specialtyController,
-                              textInputAction: TextInputAction.done,
-                              onFieldSubmitted: (_) => () {},
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Especialidad del doctor';
-                                }
-
-                                return null;
-                              },
-                            ),
-                          ],
-
-                          const SizedBox(height: 22),
-
-                          EmailField(
-                            emailController: _emailController,
-                            submit: () {},
                           ),
-
-                          const SizedBox(height: 22),
-
-                          PasswordField(
-                            passwordController: _passwordController,
-                            submit: () {},
-                          ),
-
-                          const SizedBox(height: 22),
-
-                          PasswordField(
-                            passwordController: _passwordConfirmationController,
-                            submit: () {},
-                            label: 'Confirma la contraseña',
-                          ),
-
-                          if (_error) ...[
-                            const SizedBox(height: 22),
-                            ErrorContainer(errorMessage: _errorMessage),
-                          ],
-
-                          const SizedBox(height: 16),
-
-                          SizedBox(
-                            height: 52,
-                            child: ElevatedButton(
-                              onPressed: _submit,
-                              child: const Text('Crear usuario'),
-                            ),
-                          ),
-
-                          const SizedBox(height: 16),
-                        ],
+                        ),
                       ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            if (_isSubmitting)
+              Positioned.fill(
+                child: AbsorbPointer(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+                    child: const ColoredBox(
+                      color: Colors.black26,
+                      child: Center(child: CircularProgressIndicator()),
                     ),
                   ),
                 ),
               ),
-            );
-          },
+          ],
         ),
       ),
     );

@@ -1,4 +1,5 @@
 const userRepository = require('./user_repository');
+const specialtyRepository = require('../specialty/specialty_repository');
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
 
 exports.createUser = onCall(async (request) => {
@@ -22,7 +23,14 @@ exports.createUser = onCall(async (request) => {
 
   const { email, password, user } = request.data ?? {};
 
-  return await userRepository.createUser(email, password, user);
+  const { speciality, ...userData } = user ?? {};
+
+  if (userData.role === "doctor") {
+    userData.specialityId =
+        await specialtyRepository.getSpecialtyIdByName(speciality?.name);
+  }
+
+  return await userRepository.createUser(email, password, userData);
 });
 
 exports.deleteUser = onCall(async (request) => {

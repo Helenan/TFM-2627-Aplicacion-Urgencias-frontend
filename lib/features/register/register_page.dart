@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:tfm_2627_aplicacion_urgencias_frontend/features/register/data/enums/allergy_knowledge.dart';
 import 'package:tfm_2627_aplicacion_urgencias_frontend/features/register/data/enums/biological_sex.dart';
 import 'package:tfm_2627_aplicacion_urgencias_frontend/services/patient_service.dart';
+import 'package:tfm_2627_aplicacion_urgencias_frontend/services/specialty_service.dart';
 import 'package:tfm_2627_aplicacion_urgencias_frontend/utils/allergy_knowledge_select.dart';
 import 'package:tfm_2627_aplicacion_urgencias_frontend/utils/biological_sex_select.dart';
 import 'package:tfm_2627_aplicacion_urgencias_frontend/utils/blood_group_select.dart';
@@ -16,6 +17,7 @@ import '../../utils/sucess_banner.dart';
 import 'data/enums/blood_group.dart';
 import 'data/patient.dart';
 import 'data/patient_register.dart';
+import 'data/specialty.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -36,12 +38,14 @@ class _RegisterPageState extends State<RegisterPage> {
   final _actualMedicationController = TextEditingController();
   final _chronicDiseasesController = TextEditingController();
   final _otherConditionsController = TextEditingController();
+  final _specialtyController = TextEditingController();
 
   BiologicalSex _selectedBiologicalSex = BiologicalSex.unspecified;
   AllergyKnowledge _selectedAllergyKnowledge = AllergyKnowledge.unknown;
   BloodGroup _selectedBloodGroup = BloodGroup.unknown;
 
   late Patient? patient;
+  Specialty? _selectedSpecialty;
 
   bool _isSubmitting = false;
 
@@ -114,6 +118,7 @@ class _RegisterPageState extends State<RegisterPage> {
         PatientRegister(
           patient: formPatient,
           symptoms: _symptomsController.text.trim(),
+          specialty: _selectedSpecialty!,
         ),
       );
 
@@ -417,6 +422,38 @@ class _RegisterPageState extends State<RegisterPage> {
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
                                       return 'Síntomas';
+                                    }
+
+                                    return null;
+                                  },
+                                ),
+
+                                const SizedBox(height: 22),
+
+                                Text(
+                                  'Especialidad',
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(fontWeight: FontWeight.w600),
+                                ),
+                                const SizedBox(height: 10),
+
+                                QueryingTextField(
+                                  controller: _specialtyController,
+                                  queryMethod: SpecialtyService().querySpecialty,
+                                  displayItem: (specialty) => specialty.name,
+                                  childrenOf: (specialty) =>
+                                      specialty.subspecialties,
+                                  optionsMaxHeight: 300,
+                                  hintText: 'Busca una especialidad',
+                                  onSelected: (specialty) {
+                                    _selectedSpecialty = specialty;
+                                  },
+                                  onChanged: (value) {
+                                    _selectedSpecialty = null;
+                                  },
+                                  validator: (value) {
+                                    if (_selectedSpecialty == null) {
+                                      return 'Seleccione una especialidad de la lista';
                                     }
 
                                     return null;

@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import 'tree_options_list.dart';
+
 String? _defaultValidator(String? value) => null;
 
 class QueryingTextField<T extends Object> extends StatefulWidget {
@@ -15,6 +17,8 @@ class QueryingTextField<T extends Object> extends StatefulWidget {
   final Duration timerDuration;
   final int minQueryLength;
   final String? Function(String? value) validator;
+   final List<T> Function(T item)? childrenOf;
+  final double optionsMaxHeight;
 
   const QueryingTextField({
     super.key,
@@ -28,6 +32,8 @@ class QueryingTextField<T extends Object> extends StatefulWidget {
     this.timerDuration = const Duration(milliseconds: 350),
     this.minQueryLength = 3,
     String? Function(String? value)? validator,
+    this.childrenOf,
+    this.optionsMaxHeight = 150,
   }) : validator = validator ?? _defaultValidator;
 
   @override
@@ -85,6 +91,7 @@ class _QueryingTextFieldState<T extends Object>
         return await completer.future;
       },
       onSelected: widget.onSelected,
+      optionsViewOpenDirection: OptionsViewOpenDirection.mostSpace,
       fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
         return ValueListenableBuilder<bool>(
           valueListenable: _isLoading,
@@ -114,25 +121,44 @@ class _QueryingTextFieldState<T extends Object>
       optionsViewBuilder: (context, onSelected, options) {
         return Align(
           alignment: Alignment.topLeft,
+          heightFactor: 1,
           child: Material(
             elevation: 4,
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 150),
-              child: ListView.builder(
-                padding: EdgeInsets.zero,
-                shrinkWrap: true,
-                itemCount: options.length,
-                itemBuilder: (context, index) {
-                  final option = options.elementAt(index);
-
-                  return ListTile(
-                    title: Text(widget.displayItem(option)),
-                    onTap: () => onSelected(option),
-                  );
-                },
-              ),
+              constraints: BoxConstraints(maxHeight: widget.optionsMaxHeight),
+              child: _buildOptions(onSelected, options),
             ),
           ),
+        );
+      },
+    );
+  }
+
+  Widget _buildOptions(
+    AutocompleteOnSelected<T> onSelected,
+    Iterable<T> options,
+  ) {
+    final childrenOf = widget.childrenOf;
+
+    if (childrenOf != null) {
+      return TreeOptionsList<T>(
+        items: options,
+        childrenOf: childrenOf,
+        displayItem: widget.displayItem,
+        onSelected: onSelected,
+      );
+    }
+
+    return ListView.builder(
+      padding: EdgeInsets.zero,
+      shrinkWrap: true,
+      itemCount: options.length,
+      itemBuilder: (context, index) {
+        final option = options.elementAt(index);
+
+        return ListTile(
+          title: Text(widget.displayItem(option)),
+          onTap: () => onSelected(option),
         );
       },
     );

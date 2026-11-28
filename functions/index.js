@@ -30,11 +30,13 @@ initializeApp();
 const userFunctions = require("./users/user_functions");
 const patientFunctions = require("./patients/patient_functions");
 const registerFunctions = require("./register/register_functions");
+const specialtyFunctions = require("./specialty/specialty_functions");
 
 // Assign functions from other files to the global export
 Object.assign(
 exports,
 userFunctions,
 patientFunctions,
-registerFunctions
+registerFunctions,
+specialtyFunctions
 );
